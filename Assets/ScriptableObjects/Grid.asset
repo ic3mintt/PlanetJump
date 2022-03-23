@@ -12,5 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dda433dd43054dcc804daab49eb92dc8, type: 3}
   m_Name: Grid
   m_EditorClassIdentifier: 
-  viewportYOffsetPoint: 0.0426
-  circleScaler: {fileID: 11400000, guid: 9b97bb524cf06cd48911cbe2ae294c80, type: 2}
+  viewportXOffset: 0.15

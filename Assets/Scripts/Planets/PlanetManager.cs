@@ -1,38 +1,47 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-//main task is spawning planets
 public class PlanetManager : MonoBehaviour
 {
     private List<Planet> planets;
     private ObjectPool<Planet> pool;
+    private int currentPlayerPlanet;
+    private PlanetColor planetColor;
 
     [SerializeField] private InputSystem input;
     [SerializeField] private GameObject prefab;
     [SerializeField] private int startPlanetsAmount;
     [SerializeField] private PlanetPosition planetsPosition;
     [SerializeField] private CircleScaler circlesScaler;
-    [SerializeField] private PlanetColor planetColor;
     
+    public event Action AttachToPlanetAtStart;
+
+    private void Awake()
+    {
+        //input.LeftMouseButtonChange += SpawnPlanets;
+    }
+
     private void Start()
     {
         planets = new List<Planet>();
+        planetColor = new PlanetColor();
         pool = new ObjectPool<Planet>(Spawn);
-        input.LeftMouseButtonChange += SpawnPlanets;
         CreateStartPlanets();
+        
+        AttachToPlanetAtStart?.Invoke();
     }
     
     private void SpawnPlanets(bool allowedToSpawn)
     {
         if (allowedToSpawn)
         {
-            var planet = pool.GetObject();
+            var planet = GetPlanetFromPool();
         }
     }
 
     private Planet Spawn()
     {
-        //Instantiate at some position
         var planet = Instantiate(prefab).GetComponent<Planet>();
         planets.Add(planet);
         planet.EndLife += pool.ReturnObject;
@@ -52,13 +61,12 @@ public class PlanetManager : MonoBehaviour
     {
         for (int i = 0; i < amount; i++)
         {
-            var planet = pool.GetObject();
+            var planet = GetPlanetFromPool();
             planet.transform.position = planetsPosition.GetRandomPlanetPosition(i);
         }
     }
     
-    public void MovePlanets()
-    {
-        
-    }
+    private Planet GetPlanetFromPool() => pool.GetObject();
+    
+    public Planet GetPlanetFromList() => planets[currentPlayerPlanet++];
 }

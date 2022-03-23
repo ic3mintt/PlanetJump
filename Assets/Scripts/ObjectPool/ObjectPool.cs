@@ -8,7 +8,6 @@ public class ObjectPool<T> where T : IPoolable
     public int Count
     {
         get { return pool.Count;}
-        private set{}
     }
     
     public ObjectPool(Func<T> createFunction)

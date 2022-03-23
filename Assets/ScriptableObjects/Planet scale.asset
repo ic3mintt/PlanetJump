@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 081f98088db460f47bfbd7eea741ca56, type: 3}
   m_Name: Planet scale
   m_EditorClassIdentifier: 
-  minScale: 1.7
-  maxScale: 2.4
+  minScale: 1.5
+  maxScale: 2
+  diameterStep: 0.02

@@ -7,7 +7,8 @@ public class CircleScaler : ScriptableObject
 {
     [SerializeField] private float minScale;
     [SerializeField] private float maxScale;
-
+    [SerializeField] private float diameterStep;
+    
     public void SetRandomScale(IEnumerable<Planet> circleList)
     {
         foreach (var circle in circleList)
@@ -19,5 +20,10 @@ public class CircleScaler : ScriptableObject
 
     private float GetRandomScale() => Random.Range(minScale, maxScale);
 
-    public float GetRadius() => maxScale / 2;
+    public Vector3 GetCorrectedScale(Vector3 scale)
+    {
+        scale.x -= diameterStep;
+        scale.y -= diameterStep;
+        return scale;
+    }
 }

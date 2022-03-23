@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Planet position
   m_EditorClassIdentifier: 
   grid: {fileID: 11400000, guid: 2209cfc4cd29f5f478e75e54b6703ae4, type: 2}
-  minDistanceBetweenPlanetsSurfaces: 0.669
+  minDistanceBetweenPlanetsSurfaces: 0.8
+  circleScaler: {fileID: 11400000, guid: 9b97bb524cf06cd48911cbe2ae294c80, type: 2}
