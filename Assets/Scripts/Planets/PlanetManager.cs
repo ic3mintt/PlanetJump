@@ -1,72 +1,89 @@
-using System;
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class PlanetManager : MonoBehaviour
 {
-    private List<Planet> planets;
-    private ObjectPool<Planet> pool;
-    private int currentPlayerPlanet;
-    private PlanetColor planetColor;
-
-    [SerializeField] private InputSystem input;
-    [SerializeField] private GameObject prefab;
-    [SerializeField] private int startPlanetsAmount;
-    [SerializeField] private PlanetPosition planetsPosition;
-    [SerializeField] private CircleScaler circlesScaler;
+    private Player player;
+    private Camera camera;
+    private float lineToMove;
+    private Coroutine moveToCoroutine;
+    private readonly Circle circle = new Circle();
     
-    public event Action AttachToPlanetAtStart;
-
-    private void Awake()
+    [SerializeField] private float moveSpeed;
+    [SerializeField] private float checkPlanetsPositionDelay;
+    [SerializeField] private PlanetSpawnSystem planetSpawnSystem;
+    
+    public void AtStart()
     {
-        //input.LeftMouseButtonChange += SpawnPlanets;
-    }
-
-    private void Start()
-    {
-        planets = new List<Planet>();
-        planetColor = new PlanetColor();
-        pool = new ObjectPool<Planet>(Spawn);
-        CreateStartPlanets();
+        camera = FindObjectOfType<Camera>();
+        player = FindObjectOfType<Player>();
         
-        AttachToPlanetAtStart?.Invoke();
+        player.CollisionEnter += CreateAndMovePlanets;
+        
+        var ySpawnLines = planetSpawnSystem.GetGrid().Layout.YSpawnLines;
+        lineToMove = ySpawnLines[0] + (ySpawnLines[1] - ySpawnLines[0])/2;
+        StartCoroutine(CheckPlanets());
     }
     
-    private void SpawnPlanets(bool allowedToSpawn)
+    private void CreateAndMovePlanets(Collision2D other)
     {
-        if (allowedToSpawn)
+        planetSpawnSystem.CreatePlanets(other);
+        
+        if (moveToCoroutine != null)
         {
-            var planet = GetPlanetFromPool();
+            StopCoroutine(moveToCoroutine);
+            moveToCoroutine = null;
+            StopPlanets();
         }
+        
+        var direction = player.transform.position.y <= lineToMove ? Vector2.up : Vector2.down;
+        var planets = planetSpawnSystem.GetEnabledPlanetsList();
+        
+        if (planets[1].Rigidbody.velocity == Vector2.zero)
+        {
+             for (int i = 0; i < planets.Count; i++)
+            {
+                planets[i].Rigidbody.velocity = direction * moveSpeed;
+            }
+        }
+        
+        moveToCoroutine = StartCoroutine(MoveTo(other.transform));
     }
 
-    private Planet Spawn()
+    private IEnumerator MoveTo(Transform planetCenter)
     {
-        var planet = Instantiate(prefab).GetComponent<Planet>();
-        planets.Add(planet);
-        planet.EndLife += pool.ReturnObject;
-        return planet;
+        while (true)
+        {
+            if (planetCenter.position.y <= lineToMove)
+            {
+                StopPlanets();
+                yield break;
+            }
+            yield return new WaitForSeconds(checkPlanetsPositionDelay);
+        }   
     }
 
-    private void CreateStartPlanets()
+    private IEnumerator CheckPlanets()
     {
-        planetsPosition.AtStart(startPlanetsAmount);
-        SpawnStartPlanets(startPlanetsAmount);
-        circlesScaler.SetRandomScale(planets);
-        planetsPosition.CorrectPlanetsPosition(ref planets);
-        planetColor.ChangeColors(planets);
-    }
-    
-    private void SpawnStartPlanets(int amount)
-    {
-        for (int i = 0; i < amount; i++)
+        while (true)
         {
-            var planet = GetPlanetFromPool();
-            planet.transform.position = planetsPosition.GetRandomPlanetPosition(i);
+            var planets = planetSpawnSystem.GetEnabledPlanetsList();
+            for (int i = 0; i < planets.Count; i++)
+            {
+                if (camera.WorldToViewportPoint(circle.GetUpCirclePosition(planets[i].transform)).y < 0)
+                {
+                    planets[i].EndLifeInvoke();
+                }
+            }
+            yield return new WaitForSeconds(checkPlanetsPositionDelay);   
+        }
+    } 
+    
+    private void StopPlanets()
+    {
+        foreach (var planet in planetSpawnSystem.GetEnabledPlanetsList())
+        {
+            planet.Rigidbody.velocity = Vector2.zero;
         }
     }
-    
-    private Planet GetPlanetFromPool() => pool.GetObject();
-    
-    public Planet GetPlanetFromList() => planets[currentPlayerPlanet++];
 }

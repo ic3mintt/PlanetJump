@@ -3,7 +3,10 @@ guid: ef9dd79ad69884544ac3b3772869ea7c
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - prefab: {fileID: 7136632734456764798, guid: edfb78b072d691a458871a843695418d, type: 3}
+  - planetsPosition: {fileID: 11400000, guid: c54e10055ed672d4fb3ba9db8cdadb8d, type: 2}
+  - circle: {fileID: 11400000, guid: 9b97bb524cf06cd48911cbe2ae294c80, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -1,49 +1,36 @@
 ﻿using UnityEngine;
 
-
-public class PlayerManager : MonoBehaviour
+public class PlayerManager
 {
-    private Player player;
-    [SerializeField] private PlanetManager planetManager;
+    private readonly Player player;
 
-    #region PlayerOffset
-
-    /*
-        var xOffsetFromCenter = player.localScale.x / 2;
-        var yOffsetFromCenter = player.localScale.y;
-    */
-
-    #endregion
-
-    private void Awake()
+    public PlayerManager(Player player)
     {
-        player = FindObjectOfType<Player>();
-        planetManager.AttachToPlanetAtStart += AttachPlayerToPlanetAtStart;
+        this.player = player;
         player.CollisionEnter += PlayerCollisionEnter;
     }
-
-    private void AttachPlayerToPlanetAtStart()
+    
+    public void AttachPlayerToPlanet(Transform planet)
     {
-        var planet = planetManager.GetPlanetFromList().transform;
         var playerTransform = player.transform;
         playerTransform.SetParent(planet);
         playerTransform.localPosition = new Vector3(0, 0.5f  + playerTransform.localScale.y , 0);
-        playerTransform.SetParent(null);
+        player.StartMoveAround(planet);
     }
     
     private void PlayerCollisionEnter(Collision2D other)
     {
-        if (other.gameObject.CompareTag("Planet"))
+        if (other.gameObject.GetComponent<Planet>() != null)
         {
-            AttachPlayerToPlanet(other);
-            player.StartMoveAround(other.transform.position);
+            player.transform.SetParent(other.transform);
+            StopPlayer();
+            player.StartMoveAround(other.transform);
         }
     }
-
-    private void AttachPlayerToPlanet(Collision2D planet)
+    
+    private void StopPlayer()
     {
-        var playerRigidbody = player.GetComponent<Rigidbody2D>();
-        playerRigidbody.velocity = Vector2.zero;
-        playerRigidbody.angularVelocity = 0;
+        player.Rigidbody.velocity = Vector2.zero;
+        player.Rigidbody.angularVelocity = 0;
     }
 }

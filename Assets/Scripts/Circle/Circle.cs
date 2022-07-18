@@ -1,32 +1,33 @@
-﻿using UnityEngine;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
-public class Circle
+public class Circle 
 {
-    public Vector3 GetUpPosition(Transform circle)
-    {
-        var upCirclePosition = circle.position;
-        upCirclePosition.y += circle.localScale.y / 2;
-        return upCirclePosition;
-    }
+    private readonly float minScale;
+    private readonly float maxScale;
 
-    public Vector3 GetDownPosition(Transform circle)
+    public Circle(){}
+    
+    public Circle(in float minScale, in float maxScale)
     {
-        var downCirclePosition = circle.position;
-        downCirclePosition.y -= circle.localScale.y / 2;
-        return downCirclePosition;
+        this.minScale = minScale;
+        this.maxScale = maxScale;
     }
     
-    public Vector3 GetLeftPosition(Transform circle)
+    public Vector3 GetRandomScale()
     {
-        var leftCirclePosition = circle.position;
-        leftCirclePosition.x -= circle.localScale.x / 2;
-        return leftCirclePosition;
+        if (minScale == 0 && maxScale == 0)
+            return Vector3.zero;
+        var diameter = Random.Range(minScale, maxScale);
+        return new Vector3(diameter, diameter, 0);
     }
 
-    public Vector3 GetRightPosition(Transform circle)
+    public Vector4 GetColor() => new Vector4(Random.value, Random.value, Random.value, 1);
+    
+    public Vector3 GetUpCirclePosition(Transform center)
     {
-        var leftCirclePosition = circle.position;
-        leftCirclePosition.x += circle.localScale.x / 2;
-        return leftCirclePosition;
+        var downCirclePosition = center.position;
+        downCirclePosition.y += center.localScale.y / 2;
+        return downCirclePosition;
     }
 }
