@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     
     private void Awake()
     {
-        FindObjectOfType<InputSystem>().LeftMouseButtonChange += StartMoveForward;
+        FindObjectOfType<InputSystem>().TouchChange += StartMoveForward;
         Rigidbody = GetComponent<Rigidbody2D>();
     }
     

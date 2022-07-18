@@ -3,15 +3,21 @@ using UnityEngine;
 
 public class InputSystem : MonoBehaviour
 {
-    public event Action<bool> LeftMouseButtonChange;
+    public event Action<bool> TouchChange;
 
     private void Update()
     {
-        ListenToLeftButton();
+        foreach (var touch in Input.touches)
+        {
+            if (touch.phase == TouchPhase.Began)
+            {
+                ListenToTouches();
+            }
+        }
     }
     
-    private void ListenToLeftButton()
+    private void ListenToTouches()
     {
-        LeftMouseButtonChange?.Invoke(Input.GetMouseButtonDown(0));
+        TouchChange?.Invoke(Input.GetMouseButtonDown(0));
     }
 }
